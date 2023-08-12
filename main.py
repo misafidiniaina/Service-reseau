@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import champ_personnaliser as chmPers
+import time
 from forward import *
 from input import *
 from output import *
@@ -9,11 +10,17 @@ from terminal import *
 fenetre = ctk.CTk()
 fenetre.geometry("800x500")
 fenetre.minsize(height=550,width=600)
-
 global Rule_list
+"""def remplie_tab(liste_regle:list):
+    for rule in liste_regle:
+        if rule.chain == "input":
+            contents_Input.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
+        elif rule.chain == "output":
+            contents_Output.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
+        else:
+            contents_forward.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
+"""
 def move_next_page():
-    update_file()
-    Rule_list = get_rule("liste_rule.txt")
     global cont
     buton2.configure(corner_radius=0,fg_color="#1a232e",border_color="white",border_width=0,text_color="white")
     buton1.configure(corner_radius=0,fg_color="transparent",border_color="#1a232e",border_width=0,text_color="black")
@@ -23,7 +30,26 @@ def move_next_page():
         cont +=1
         page = pages[cont]
         page.pack(fill=ctk.BOTH,expand=True,pady=10)
- 
+    rule_list = update_file()
+    #remplie_tab(rule_list)
+    
+    for rule in rule_list:
+        if rule.chain == "input":
+            contents_Input.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
+        elif rule.chain == "output":
+            contents_Output.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
+        else:
+            contents_forward.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
+    #tableau_Input.clean()
+    tableau_Input.affiche(contents_Input)
+    tableau_Output.affiche(contents_Output)
+    tableau_forward.affiche(contents_forward)
+    contents_Input.clear()
+    contents_Output.clear()
+    contents_forward.clear()
+    #fenetre.update()
+
+  
 def move_back_page():
     buton1.configure(corner_radius=0,fg_color="#1a232e",border_color="white",border_width=0,text_color="white")
     buton2.configure(corner_radius=0,fg_color="transparent",border_color="#1a232e",border_width=0,text_color="black")
@@ -35,6 +61,9 @@ def move_back_page():
         cont -=1
         page = pages[cont]
         page.pack(fill=ctk.BOTH,expand=True,pady=10)
+    tableau_Input.clean()
+    tableau_Output.clean()
+    tableau_forward.clean()
 
 def validate_entry(action, value_if_allowed):
     if action == '0':  # Suppression de texte
@@ -44,26 +73,12 @@ def validate_entry(action, value_if_allowed):
     else:
         return False
 
-def disable_frame(frame):
-    for widget in frame.winfo_children():
-        
-        if isinstance(widget, (ctk.CTkEntry, ctk.CTkButton, ctk.CTkCheckBox, ctk.CTkRadioButton)):
-            widget.configure(state="disabled",fg_color="gray")
-        elif isinstance(widget, ctk.CTkComboBox):
-            widget.configure(state="readonly")
-        elif isinstance(widget, ctk.CTkTextbox):
-            widget.configure(state="disabled")
-        elif isinstance(widget, ctk.CTkCanvas):
-            widget.unbind("<Button-1>")
-        
-        disable_frame(widget)
-
 #navigation
 nav = ctk.CTkFrame(fenetre,fg_color="#c4eaee",corner_radius=0)
 buton1=ctk.CTkButton(nav,text=" Nouvelle règle ",command=move_back_page,corner_radius=0,fg_color="#1a232e",border_color="white",border_width=0,text_color="white")
 buton1.pack(side=ctk.LEFT,padx=2,ipady=5,ipadx=5)
 
-buton2=ctk.CTkButton(nav,text=" Liste des règles ",command=move_next_page,corner_radius=0,fg_color="transparent",border_color="#1a232e",border_width=0,text_color="black")
+buton2=ctk.CTkButton(nav,text=" Liste des règles ", corner_radius=0,fg_color="transparent", command=move_next_page, border_color="#1a232e",border_width=0,text_color="black")
 buton2.pack(side=ctk.LEFT,padx=2,ipady=5,ipadx=5)
 
 nav.pack(side=ctk.TOP,fill=ctk.X,pady=1)
@@ -410,14 +425,9 @@ def forward_clicked(): #fonction qui agit si on veut voir la liste de FORWARD
 contents_Input = []
 contents_Output = []
 contents_forward = [] 
-Rule_list = update_file()                                                                    #exmple
-for rule in Rule_list:
-    if rule.chain == "input":
-        contents_Input.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
-    elif rule.chain == "output":
-        contents_Output.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
-    else:
-        contents_forward.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
+Rule_list = get_rule("liste_rule.txt")                                                                    #exmple
+
+
     
 bouton_liste_frame = ctk.CTkFrame(page2,fg_color="transparent")
 delete_btn = ctk.CTkButton(bouton_liste_frame,text="Supprimer",state=ctk.DISABLED,text_color_disabled="gray")
@@ -432,8 +442,7 @@ I_puce = ctk.CTkLabel(I_title_frame)
 #****
 I_list = ctk.CTkFrame(input_LFrame)#contenu de la liste INPUT 
 
-tableau_Input = chmPers.tableau(I_list,contents_Input,delete_btn) #utilisation de la classe tableau pour afficher les données INPUT
-tableau_Input.affiche()
+tableau_Input = chmPers.tableau(I_list,delete_btn) #utilisation de la classe tableau pour afficher les données INPUT
 #***
 input_LFrame.pack(fill=ctk.BOTH,padx=10,pady=10)
 
@@ -444,8 +453,8 @@ title_output = ctk.CTkButton(O_title_frame,command=output_clicked,corner_radius=
 title_output.pack(side=ctk.LEFT)
 #***
 O_list = ctk.CTkFrame(output_LFrame)#utilisation de la classe tableau pour afficher les données pour OUTPUT
-tableau_Output = chmPers.tableau(O_list,contents_Output,delete_btn)
-tableau_Output.affiche()
+tableau_Output = chmPers.tableau(O_list,delete_btn)
+#tableau_Output.affiche()
 #***
 output_LFrame.pack(fill=ctk.BOTH,padx=10,pady=10)
 
@@ -456,8 +465,8 @@ title_forward = ctk.CTkButton(F_title_frame,command=forward_clicked,corner_radiu
 title_forward.pack(side=ctk.LEFT)
 #***
 F_list = ctk.CTkFrame(forward_LFrame) #utilisation de la classe tableau pour afficher les données pour FORWARD
-tableau_forward = chmPers.tableau(F_list,contents_forward,delete_btn)
-tableau_forward.affiche()
+tableau_forward = chmPers.tableau(F_list,delete_btn)
+#tableau_forward.affiche()
 forward_LFrame.pack(fill=ctk.BOTH,padx=10,pady=10)
 
 
