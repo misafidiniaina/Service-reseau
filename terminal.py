@@ -154,5 +154,5 @@ def update_file():
      mise à jour de la règles 
     """
      # lancer la commande de listage des règles dans le système
-    subprocess.run("sudo iptables -t filter -L --line-numbers > liste_rule.txt", text=True, capture_output=True, shell=True)
+    #subprocess.run("sudo iptables -t filter -L --line-numbers > liste_rule.txt", text=True, capture_output=True, shell=True)
     return get_rule("liste_rule.txt")

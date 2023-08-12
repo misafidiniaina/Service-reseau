@@ -76,26 +76,25 @@ class ttt:
 
 
 class tableau:
-    def __init__(self,master,contents,bouton):
-        self.contents=contents
+    def __init__(self,master,bouton):
         self.master=master
         self.bouton=bouton
-    def affiche(self):
-
+        self.list_frame = None
+    def affiche(self,contents):
+        #self.clean()
         def checked_listner():
-           for state in states:
-               print(state.get())
-               
+            print(str(state.get()))
+            """if any(state.get() == 1 in state):
+                self.bouton.configure(state=ctk.DISABLED)
+            else:
+                self.bouton.configure(state=ctk.NORMAL)"""
             
                 
         list_frame = ctk.CTkFrame(self.master)
+        self.list_frame = list_frame
         headers=['','Règles','Protocole','Options','Source','Destination','Déscription']
         cellule=['none']*7
         header=[0,0,0,0,0,0,0]
-        check = ['']*len(self.contents)
-        state = ctk.StringVar()
-        global states
-        states = [state]*len(self.contents)
         header_frame = ctk.CTkFrame(list_frame)
         for i in range(len(headers)):
             cellule[i] = ctk.CTkFrame(header_frame,border_width=1,border_color="black",corner_radius=0)
@@ -104,21 +103,22 @@ class tableau:
             text.pack(fill=ctk.X,padx=5,pady=5)
             header[i].pack(fill=ctk.X,expand=True)
             cellule[i].pack(fill=ctk.X,side=ctk.LEFT,expand=True)
-        for data in range(len(self.contents)):
-            for col in range(len(self.contents[data])):
-                text = str(self.contents[data][col])
+        for data in range(len(contents)):
+            for col in range(len(contents[data])):
+                text = str(contents[data][col])
                 if col==0:
-                    
-                    check[data] = ctk.CTkCheckBox(cellule[col],text="",checkbox_width=20,checkbox_height=20,height=28,width=1,command=checked_listner,variable=state,onvalue=self.contents[data][col],offvalue="off")
-                    check[data].pack(pady=3)
+                    state = ctk.StringVar()
+                    check = ctk.CTkCheckBox(cellule[col],text="",checkbox_width=20,checkbox_height=20,height=28,width=1,command=checked_listner,variable=state,onvalue="on",offvalue="off")
+                    check.pack(pady=3)
                 else:
                     donnee = ctk.CTkLabel(cellule[col],text=text)
                     donnee.pack(pady=3)
         header_frame.pack(fill=ctk.X)
         list_frame.pack(fill=ctk.BOTH,expand=True,padx=5,pady=5)
-
-    
         
+    def clean(self):
+        self.list_frame.destroy()
+
     
     
 
