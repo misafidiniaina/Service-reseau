@@ -2,13 +2,13 @@ import subprocess
 
 
 class Input:
-    __protocole = None
-    __port = None
-    __source = None
-    __intf = None
-    __jump = None
-    __error: str = None
-    __success: str = None
+    __protocole = ''
+    __port = ''
+    __source = ''
+    __intf = ''
+    __jump = ''
+    __error: str = ''
+    __success: str = ''
 
     def __init__(self, protocole, port, source, intf):
         super().__init__()
@@ -28,16 +28,16 @@ class Input:
         argument = ""
         # louper à travers les attributs
         for key, value in attr.items():
-            if value is not None:
+            if value != '':
                 argument += f"{key} {value} "
 
         # Sauvegarder la commande
-        commande = f"iptables -{place} INPUT {argument} -j {jump}"
+        commande = f"sudo iptables -{place} INPUT {argument} -j {jump}"
 
         # execution de la commande
         resultat = subprocess.run(commande, capture_output=True, text=True, shell=True)
 
-        if resultat.stdout:
+        if resultat.returncode == 0:
             self.__success = "Operation effectuée avec succès."
             return self.__success
         else:

@@ -1,58 +1,47 @@
 import customtkinter as ctk
 import champ_personnaliser as chmPers
-import time
+from CTkMessagebox import CTkMessagebox
 from forward import *
 from input import *
 from output import *
 from regle import *
 from terminal import *
+from tableau import tableau
+
 
 fenetre = ctk.CTk()
 fenetre.geometry("800x500")
 fenetre.minsize(height=550,width=600)
 global Rule_list
-"""def remplie_tab(liste_regle:list):
-    for rule in liste_regle:
-        if rule.chain == "input":
-            contents_Input.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
-        elif rule.chain == "output":
-            contents_Output.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
-        else:
-            contents_forward.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
-"""
 def move_next_page():
     global cont
-    buton2.configure(corner_radius=0,fg_color="#1a232e",border_color="white",border_width=0,text_color="white")
-    buton1.configure(corner_radius=0,fg_color="transparent",border_color="#1a232e",border_width=0,text_color="black")
+    buton2.configure(corner_radius=0,fg_color="#1a232e",border_color="white",border_width=0,text_color="white",hover_color="#1a232e")
+    buton1.configure(corner_radius=0,fg_color="transparent",border_color="#1a232e",border_width=0,text_color="black",hover_color="#b5dbdf")
     if not cont > len(pages) - 2:
         for p in pages:
             p.pack_forget()
         cont +=1
         page = pages[cont]
         page.pack(fill=ctk.BOTH,expand=True,pady=10)
+    tableau_Input.clean()
+    tableau_Output.clean()
+    tableau_forward.clean()
     rule_list = update_file()
-    #remplie_tab(rule_list)
-    
+    #remplie_tab(rule_list
+    tableau_Input.buildTabHeader()
+    tableau_Output.buildTabHeader()
+    tableau_forward.buildTabHeader()
     for rule in rule_list:
         if rule.chain == "input":
-            contents_Input.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
+            tableau_Input.buildItems(rule)
         elif rule.chain == "output":
-            contents_Output.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
+            tableau_Output.buildItems(rule)
         else:
-            contents_forward.append([rule.num,rule.target,rule.protocol,rule.option,rule.source,rule.destination, rule.etat])
-    #tableau_Input.clean()
-    tableau_Input.affiche(contents_Input)
-    tableau_Output.affiche(contents_Output)
-    tableau_forward.affiche(contents_forward)
-    contents_Input.clear()
-    contents_Output.clear()
-    contents_forward.clear()
-    #fenetre.update()
-
+            tableau_forward.buildItems(rule)
   
 def move_back_page():
-    buton1.configure(corner_radius=0,fg_color="#1a232e",border_color="white",border_width=0,text_color="white")
-    buton2.configure(corner_radius=0,fg_color="transparent",border_color="#1a232e",border_width=0,text_color="black")
+    buton1.configure(corner_radius=0,fg_color="#1a232e",border_color="white",border_width=0,text_color="white",hover_color="#1a232e")
+    buton2.configure(corner_radius=0,fg_color="transparent",border_color="#1a232e",border_width=0,text_color="black",hover_color="#b5dbdf")
 
     global cont
     if not cont == 0:
@@ -61,9 +50,7 @@ def move_back_page():
         cont -=1
         page = pages[cont]
         page.pack(fill=ctk.BOTH,expand=True,pady=10)
-    tableau_Input.clean()
-    tableau_Output.clean()
-    tableau_forward.clean()
+    
 
 def validate_entry(action, value_if_allowed):
     if action == '0':  # Suppression de texte
@@ -75,10 +62,10 @@ def validate_entry(action, value_if_allowed):
 
 #navigation
 nav = ctk.CTkFrame(fenetre,fg_color="#c4eaee",corner_radius=0)
-buton1=ctk.CTkButton(nav,text=" Nouvelle règle ",command=move_back_page,corner_radius=0,fg_color="#1a232e",border_color="white",border_width=0,text_color="white")
+buton1=ctk.CTkButton(nav,text=" Nouvelle règle ",command=move_back_page,corner_radius=0,fg_color="#1a232e",border_color="white",border_width=0,text_color="white",hover_color="#1a232e",cursor="hand2")
 buton1.pack(side=ctk.LEFT,padx=2,ipady=5,ipadx=5)
 
-buton2=ctk.CTkButton(nav,text=" Liste des règles ", corner_radius=0,fg_color="transparent", command=move_next_page, border_color="#1a232e",border_width=0,text_color="black")
+buton2=ctk.CTkButton(nav,text=" Liste des règles ", corner_radius=0,fg_color="transparent", command=move_next_page, border_color="#1a232e",border_width=0,text_color="black",hover_color="#b5dbdf",cursor="hand2")
 buton2.pack(side=ctk.LEFT,padx=2,ipady=5,ipadx=5)
 
 nav.pack(side=ctk.TOP,fill=ctk.X,pady=1)
@@ -90,8 +77,6 @@ main_frame=ctk.CTkFrame(fenetre,fg_color="#1a232e")
 #premier page
 page1=ctk.CTkFrame(main_frame,fg_color="transparent")
 
-
-
 titre = ctk.CTkFrame(page1,corner_radius=0,fg_color="transparent")
 titre_label = ctk.CTkLabel(titre,text="Par-feu personnalisé",font=("arial",20),text_color="#2ca089")
 titre_label.pack(pady=0)
@@ -100,7 +85,7 @@ titre.pack(fill=ctk.X)
 
 input_frame = ctk.CTkFrame(page1,fg_color="transparent")
 
-Chain_tab = ctk.CTkTabview(input_frame,segmented_button_fg_color='#1a232f',fg_color='#16181D',width=50)
+Chain_tab = ctk.CTkTabview(input_frame,segmented_button_fg_color='#16181D',fg_color='#16181D',width=50,segmented_button_selected_color="#2C7365",segmented_button_selected_hover_color="#4C9385")
 Input_tab = Chain_tab.add("  Entrant  ")
 Output_tab = Chain_tab.add("  Sortant  ")
 Forward_tab = Chain_tab.add("  Passant  ")
@@ -122,7 +107,7 @@ champ4 = ctk.CTkFrame(Input_chain_composant,fg_color='transparent')
 label4=ctk.CTkLabel(champ4,text="Interface :                                   ")
 label4.pack(side=ctk.LEFT)
 liste_interface = get_link_interface()
-interface_Input_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100)
+interface_Input_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
 interface_Input_chain.configure(state='readonly')
 interface_Input_chain.pack(side=ctk.LEFT)
 champ4.pack(fill=ctk.BOTH,pady=10,padx=30)
@@ -130,7 +115,7 @@ champ4.pack(fill=ctk.BOTH,pady=10,padx=30)
 champ3 = ctk.CTkFrame(Input_chain_composant,fg_color="transparent")
 label5 = ctk.CTkLabel(champ3,text="Protocole:                                   ")
 label5.pack(side=ctk.LEFT)
-protocole_input_chain=ctk.CTkComboBox(champ3,values=["TCP","UDP","TCP/UDP"],width=100)
+protocole_input_chain=ctk.CTkComboBox(champ3,values=["TCP","UDP","TCP/UDP"],width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
 protocole_input_chain.configure(state='readonly')
 protocole_input_chain.pack(side=ctk.LEFT)
 label3 = ctk.CTkLabel(champ3,text="       Port:      ")
@@ -154,19 +139,20 @@ champ6.pack(fill=ctk.X,pady=10,padx=30)
 Input_chain_composant.pack(pady=10) 
 input_frame.pack(fill=ctk.BOTH,expand=True,padx=20,pady=5)
 bouton_Input_chain_frame = ctk.CTkFrame(Input_tab,fg_color="transparent")
-bouton = ctk.CTkFrame(bouton_Input_chain_frame,fg_color="transparent")              #**************
-def get_data_input():                                                               #**************
-    port = sport.get()                                                              #**************
-    protocol = protocole_input_chain.get()                                          #**************        
-    action_ = action_input_chain.get()                                              #**************
+bouton = ctk.CTkFrame(bouton_Input_chain_frame,fg_color="transparent")             
+def get_data_input():           
+    port = sport.get()                                                             
+    protocol = protocole_input_chain.get()                                                 
+    action_ = action_input_chain.get()                                             
     ip_source_ = ip_source_input._get_ip()                                          
     interface = interface_Input_chain.get()
     input = Input(protocol,port,ip_source_,interface)
-    print(input.save(action_))
+    return_message = input.save(action_)
+    Mbox = chmPers.Messagebox(return_message)
+    Mbox.affiche_mbox()
+    annuler_input()
 
-    
-
-bouton_ok_INPUT = ctk.CTkButton(bouton,
+bouton_ok_INPUT = ctk.CTkButton(bouton,cursor="hand2",
     text="Ok",                      
     width=50,
     height=35,
@@ -179,7 +165,7 @@ def annuler_input():
     ip_source_input._set_empty()
     ip_source_input._set_focus()
 
-bouton_annuler_INPUT = ctk.CTkButton(bouton,
+bouton_annuler_INPUT = ctk.CTkButton(bouton,cursor="hand2",
     text="Annuler",
     width=80,
     fg_color="transparent",
@@ -208,7 +194,7 @@ champ2.pack(fill=ctk.X,pady=10,padx=30)
 champ4 = ctk.CTkFrame(Output_chain_composant,fg_color='transparent')
 label4=ctk.CTkLabel(champ4,text="Interface :                                   ")
 label4.pack(side=ctk.LEFT)
-interface_Output_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100)
+interface_Output_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
 interface_Output_chain.configure(state='readonly')
 interface_Output_chain.pack(side=ctk.LEFT)
 champ4.pack(fill=ctk.BOTH,pady=10,padx=30)
@@ -216,7 +202,7 @@ champ4.pack(fill=ctk.BOTH,pady=10,padx=30)
 champ3 = ctk.CTkFrame(Output_chain_composant,fg_color="transparent")
 label5 = ctk.CTkLabel(champ3,text="Protocole:                                   ")
 label5.pack(side=ctk.LEFT)
-protocole=ctk.CTkComboBox(champ3,values=["TCP","UDP","TCP/UDP"],width=100)
+protocole=ctk.CTkComboBox(champ3,values=["TCP","UDP","TCP/UDP"],width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
 protocole.configure(state='readonly')
 protocole.pack(side=ctk.LEFT)
 label3 = ctk.CTkLabel(champ3,text="       Port:      ")
@@ -247,15 +233,14 @@ def yes():
     action_ = action_output_chain.get()
     ip_dest = ip_destination_output._get_ip()
     interface = interface_Output_chain.get()
-    print("port source : "+port_s)
-    print("portocole : "+protocol)
-    print("action à faire : "+action_)
-    print("ip de destination:"+ip_dest)
-    print("interface :"+interface)
     output = Output(protocol,port_s,ip_dest,interface)
-    output.save(action_)
+    return_message = output.save(action_)
+    Mbox = chmPers.Messagebox(return_message)
+    Mbox.affiche_mbox()
+    annuler_output()
+    
 
-bouton_ok_OUTPUT = ctk.CTkButton(bouton,
+bouton_ok_OUTPUT = ctk.CTkButton(bouton,cursor="hand2",
     text="Ok",                      
     width=50,
     height=35,
@@ -268,7 +253,7 @@ def annuler_output():
     ip_destination_output._set_empty()
     ip_destination_output._set_focus()
 
-bouton_annuler_OUTPUT = ctk.CTkButton(bouton,
+bouton_annuler_OUTPUT = ctk.CTkButton(bouton,cursor="hand2",
     text="Annuler",
     width=80,
     fg_color="transparent",
@@ -304,12 +289,12 @@ champ1.pack(fill=ctk.X,pady=10,padx=30)
 champ4 = ctk.CTkFrame(Forward_chain_composant,fg_color='transparent')
 label4=ctk.CTkLabel(champ4,text="Interface d'entrée                    ")
 label4.pack(side=ctk.LEFT)
-interface_entrer_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100)
+interface_entrer_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
 interface_entrer_chain.configure(state='readonly')
 interface_entrer_chain.pack(side=ctk.LEFT)
 label4=ctk.CTkLabel(champ4,text="      Interface de sortie:      ")
 label4.pack(side=ctk.LEFT)
-interface_sortie_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100)
+interface_sortie_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
 interface_sortie_chain.configure(state='readonly')
 interface_sortie_chain.pack(side=ctk.LEFT)
 champ4.pack(fill=ctk.BOTH,pady=10,padx=30)
@@ -317,7 +302,7 @@ champ4.pack(fill=ctk.BOTH,pady=10,padx=30)
 champ3 = ctk.CTkFrame(Forward_chain_composant,fg_color="transparent")
 label5 = ctk.CTkLabel(champ3,text="Protocole:                                   ")
 label5.pack(side=ctk.LEFT)
-protocole=ctk.CTkComboBox(champ3,values=["TCP","UDP","TCP/UDP"],width=100)
+protocole=ctk.CTkComboBox(champ3,values=["TCP","UDP","TCP/UDP"],width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
 protocole.configure(state='readonly')
 protocole.pack(side=ctk.LEFT)
 
@@ -357,18 +342,14 @@ def yes():
     action_ = action.get()
     ip_d = ip_destination._get_ip()
     ip_s = ip_source._get_ip()
+    print(ip_d)
+    forward = Forward(protocol,port_s,port_d,INint,Outint,ip_s,ip_d)
+    return_message = forward.save(action_)
+    Mbox = chmPers.Messagebox(return_message)
+    Mbox.affiche_mbox()
+    annuler_forward()
 
-    print("ip resource:"+ip_s)
-    print("ip de destination:"+ip_d)
-    print("port source : "+port_s)
-    print("port destination:"+port_d)
-    print("portocole : "+protocol)
-    print("action à faire : "+action_)
-    print("interface d'entree:"+INint)
-    print("interface de sortie:"+Outint)
-    
-
-bouton_ok_FORWARD = ctk.CTkButton(bouton,
+bouton_ok_FORWARD = ctk.CTkButton(bouton,cursor="hand2",
     text="Ok",                      
     width=50,
     height=35,
@@ -385,7 +366,7 @@ def annuler_forward():
     ip_source._set_empty()
     ip_source._set_focus()
 
-bouton_annuler_FORWARD = ctk.CTkButton(bouton,
+bouton_annuler_FORWARD = ctk.CTkButton(bouton,cursor="hand2",
     text="Annuler",
     width=80,
     fg_color="transparent",
@@ -425,35 +406,50 @@ def forward_clicked(): #fonction qui agit si on veut voir la liste de FORWARD
 contents_Input = []
 contents_Output = []
 contents_forward = [] 
-Rule_list = get_rule("liste_rule.txt")                                                                    #exmple
-
-
+#Rule_list = get_rule("liste_rule.txt")                                                                    #exmple
+def delete_checked():
+    if len(tableau.list_checked) == 1:
+        message = "Etes-vous sûre de supprimer cette règle ?"
+    else:
+        message = "Etes-vous sûre de supprimer ces "+str(len(tableau.list_checked))+" règles ?"
+    msg = CTkMessagebox(title="Supprimer ?", message=message,icon="question", option_1="Annuler", option_2="Oui")
     
+    response = msg.get()
+    if response == "Oui":
+        I_list.pack_forget()
+        O_list.pack_forget()
+        F_list.pack_forget()
+        delete_btn.configure(state=ctk.DISABLED)
+        effacer_regle(tableau.list_checked)
+        move_next_page()
+    else:
+        pass
+
 bouton_liste_frame = ctk.CTkFrame(page2,fg_color="transparent")
-delete_btn = ctk.CTkButton(bouton_liste_frame,text="Supprimer",state=ctk.DISABLED,text_color_disabled="gray")
+delete_btn = ctk.CTkButton(bouton_liste_frame,text="Supprimer",fg_color="#e36060",hover_color="#f47171",state=ctk.DISABLED,text_color_disabled="#fC8282",command=delete_checked,cursor="circle")
 Liste_regle_frame = ctk.CTkScrollableFrame(page2,fg_color="transparent") #frame principale pour les liste accordion
 input_LFrame = ctk.CTkFrame(Liste_regle_frame,fg_color="transparent")#frame pour la liste des input
 I_title_frame = ctk.CTkFrame(input_LFrame,fg_color="transparent")#frame contenant le titre INPUT
 I_title_frame.pack(fill=ctk.X,pady=5,padx=5)
-title_input = ctk.CTkButton(I_title_frame,command=input_clicked,corner_radius=0,text=" Entrant (INPUT) ")#titre clicable pour la liste INPUT
-title_input.pack(side=ctk.LEFT)
-I_puce = ctk.CTkLabel(I_title_frame)
+title_input = ctk.CTkButton(I_title_frame,fg_color="#fcf6f1",text_color="#404040",hover_color="#fff7f2",width=250,cursor="hand2",command=input_clicked,corner_radius=0,text=" Entrant (INPUT) ")#titre clicable pour la liste INPUT
+title_input.pack(side=ctk.RIGHT)
+I_puce = ctk.CTkLabel(I_title_frame,fg_color="transparent")
 #I_puce.pack()
 #****
 I_list = ctk.CTkFrame(input_LFrame)#contenu de la liste INPUT 
 
-tableau_Input = chmPers.tableau(I_list,delete_btn) #utilisation de la classe tableau pour afficher les données INPUT
+tableau_Input = tableau(I_list,delete_btn) #utilisation de la classe tableau pour afficher les données INPUT
 #***
 input_LFrame.pack(fill=ctk.BOTH,padx=10,pady=10)
 
 output_LFrame = ctk.CTkFrame(Liste_regle_frame,fg_color="transparent")#frame pour la liste des output
 O_title_frame = ctk.CTkFrame(output_LFrame,fg_color="transparent")#frame contenant le titre OUTPUT
 O_title_frame.pack(fill=ctk.X,pady=5,padx=5)
-title_output = ctk.CTkButton(O_title_frame,command=output_clicked,corner_radius=0,text=" Sortant (OUTPUT) ")#titre clicable pour la liste OUTPUT
-title_output.pack(side=ctk.LEFT)
+title_output = ctk.CTkButton(O_title_frame,fg_color="#fcf6f1",text_color="#404040",hover_color="#fff7f2",width=250,cursor="hand2",command=output_clicked,corner_radius=0,text=" Sortant (OUTPUT) ")#titre clicable pour la liste OUTPU,cursor="hand2"T
+title_output.pack(side=ctk.RIGHT)
 #***
 O_list = ctk.CTkFrame(output_LFrame)#utilisation de la classe tableau pour afficher les données pour OUTPUT
-tableau_Output = chmPers.tableau(O_list,delete_btn)
+tableau_Output = tableau(O_list,delete_btn)
 #tableau_Output.affiche()
 #***
 output_LFrame.pack(fill=ctk.BOTH,padx=10,pady=10)
@@ -461,12 +457,10 @@ output_LFrame.pack(fill=ctk.BOTH,padx=10,pady=10)
 forward_LFrame = ctk.CTkFrame(Liste_regle_frame,fg_color="transparent")#frame pour la liste des forward
 F_title_frame = ctk.CTkFrame(forward_LFrame,fg_color='transparent')#frame contenant le titre FORWARD
 F_title_frame.pack(fill=ctk.X,pady=5,padx=5)
-title_forward = ctk.CTkButton(F_title_frame,command=forward_clicked,corner_radius=0,text=" Passant (FORWARD) ")#titre clicable pour la liste FORWARD
-title_forward.pack(side=ctk.LEFT)
-#***
+title_forward = ctk.CTkButton(F_title_frame,fg_color="#fcf6f1",text_color="#404040",hover_color="#fff7f2",width=250,cursor="hand2",command=forward_clicked,corner_radius=0,text=" Passant (FORWARD) ")#titre clicable pour la liste FORWAR,cursor="hand2"D
+title_forward.pack(side=ctk.RIGHT)
 F_list = ctk.CTkFrame(forward_LFrame) #utilisation de la classe tableau pour afficher les données pour FORWARD
-tableau_forward = chmPers.tableau(F_list,delete_btn)
-#tableau_forward.affiche()
+tableau_forward = tableau(F_list,delete_btn)
 forward_LFrame.pack(fill=ctk.BOTH,padx=10,pady=10)
 
 
@@ -474,19 +468,13 @@ Liste_regle_frame.pack(fill=ctk.BOTH,expand=True,pady=10)
 
 
 
-delete_btn.pack(ipady=5,ipadx=3)
+delete_btn.pack(ipady=5,ipadx=3,side=ctk.LEFT,padx=25)
 bouton_liste_frame.pack(fill=ctk.BOTH,side=ctk.BOTTOM)
-
 
 
 main_frame.pack(fill=ctk.BOTH,expand=True)
 
 pages= [page1,page2]
 cont=0
-
-    
-
-
-
 
 fenetre.mainloop()

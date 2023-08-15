@@ -4,15 +4,15 @@ import terminal
 
 
 class Forward:
-    __protocole = None
-    __sport = None
-    __dport = None
-    __intIn = None
-    __intOut = None
-    __source = None
-    __destination = None
-    __error: str = None
-    __success: str = None
+    __protocole = ''
+    __sport = ''
+    __dport = ''
+    __intIn = ''
+    __intOut = ''
+    __source = ''
+    __destination = ''
+    __error: str = ''
+    __success: str = ''
 
     def __init__(self, protocole, sport, dport, intIn, intOut, source, dest):
         self.__dport = dport
@@ -37,16 +37,16 @@ class Forward:
         argument = ""
         # louper à travers les attributs
         for key, value in attr.items():
-            if value is not None:
+            if value != '':
                 argument += f"{key} {value} "
 
         # Sauvegarder la commande
-        commande = f"iptables -{place} FORWARD {argument} -j {jump}"
+        commande = f"sudo iptables -{place} FORWARD {argument} -j {jump}"
 
         # execution de la commande
-        resultat = terminal.command_line(commande)
+        resultat = subprocess.run(commande, capture_output=True, text=True, shell=True)
 
-        if resultat.stdout:
+        if resultat.returncode == 0:
             self.__success = "Operation effectuée avec succès."
             return self.__success
         else:

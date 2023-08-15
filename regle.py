@@ -1,6 +1,6 @@
 
 class Regle:
-    def __init__(self, chain, num, target, prot, opt, source, destination,etat):
+    def __init__(self, chain, num, target, prot, opt, source, destination,etat:list):
         self.__num = num
         self.__target = target
         self.__prot = prot
@@ -8,7 +8,7 @@ class Regle:
         self.__source = source
         self.__destination = destination
         self.__chain = chain
-        self.__etat=etat
+        self.__etat = " ".join(etat)
     @property
     def etat(self):
         return self.__etat

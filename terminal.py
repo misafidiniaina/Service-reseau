@@ -62,7 +62,8 @@ def get_protocol(file_path: str = '/etc/services') -> dict:
 def command_line(command: str, arg: str = None):
     # execution de la commande
     if arg is not None:
-        resultat = subprocess.run(f"{command} {arg}", capture_output=True, text=True, shell=True)
+        command = f"{command} {arg}"
+        resultat = subprocess.run(command, capture_output=True, text=True, shell=True)
     else:
         resultat = subprocess.run(command, capture_output=True, text=True, shell=True)
 
@@ -100,7 +101,7 @@ def get_rule(path_to_file: str) -> list:
                         #                     ce qui veut dire, on passe à la CHAIN suivant, qui est forward avec i == 1
                         if j < num:
                             regle = Regle("input", num, line_to_list[1], line_to_list[2], line_to_list[3],
-                                          line_to_list[4], line_to_list[5], line_to_list[6])
+                                          line_to_list[4], line_to_list[5], line_to_list[6:])
                             j = num
                             # ajouter les listes dans la liste de reglement
                             list_rule.append(regle)
@@ -112,7 +113,7 @@ def get_rule(path_to_file: str) -> list:
                     if i == 1:
                         if j < num:
                             regle = Regle("forward", num, line_to_list[1], line_to_list[2], line_to_list[3],
-                                          line_to_list[4], line_to_list[5], line_to_list[6])
+                                          line_to_list[4], line_to_list[5], line_to_list[6:])
                             j = num
                             # ajouter les listes dans la liste de reglement
                             list_rule.append(regle)
@@ -124,7 +125,7 @@ def get_rule(path_to_file: str) -> list:
                     if i == 2:
                         if j < num:
                             regle = Regle("output", num, line_to_list[1], line_to_list[2], line_to_list[3],
-                                          line_to_list[4], line_to_list[5], line_to_list[6])
+                                          line_to_list[4], line_to_list[5], line_to_list[6:])
                             j = num
                             # ajouter les listes dans la liste de reglement
                             list_rule.append(regle)
@@ -154,5 +155,47 @@ def update_file():
      mise à jour de la règles 
     """
      # lancer la commande de listage des règles dans le système
-    #subprocess.run("sudo iptables -t filter -L --line-numbers > liste_rule.txt", text=True, capture_output=True, shell=True)
+    subprocess.run("sudo iptables -t filter -L --line-numbers > liste_rule.txt", text=True, capture_output=True, shell=True)
     return get_rule("liste_rule.txt")
+
+def effacer_regle(num_chain: list):
+    # liste des numeros par chain
+    num_input_chain = []
+    num_output_chain = []
+    num_forward_chain = []
+    
+    # verifie si les items contiennent input, output, forward
+    for item in num_chain:
+        if "input" in item:
+            num_input_chain.append(int(item.split("_")[0]))
+            num_input_chain.sort()
+        elif "output" in item:
+            num_output_chain.append(int(item.split("_")[0]))
+            num_output_chain.sort()
+        elif "forward" in item:
+            num_forward_chain.append(int(item.split("_")[0]))
+            num_forward_chain.sort()
+
+    # effacer les regles
+    for i in range(len(num_input_chain)):
+        command_line("sudo iptables", f" -t filter -D INPUT {num_input_chain[i]}")
+        if i != len(num_input_chain) - 1:
+            j = i + 1
+            for j in range(len(num_input_chain)):
+                num_input_chain[j] -= 1
+        
+    
+    for i in range(len(num_output_chain)):
+        command_line("sudo iptables", f" -t filter -D OUTPUT {num_output_chain[i]}")
+        if i != len(num_input_chain) - 1:
+            j = i + 1
+            for j in range(len(num_output_chain)):
+                num_output_chain[j] -= 1
+
+
+    for i in range(len(num_forward_chain)):
+        command_line("sudo iptables", f" -t filter -D FORWARD {num_forward_chain[i]}")
+        if i != len(num_forward_chain) - 1:
+            j = i + 1
+            for j in range(len(num_forward_chain)):
+                num_forward_chain[j] -= 1 

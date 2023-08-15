@@ -4,13 +4,13 @@ import terminal
 
 
 class Output:
-    __protocole = None
-    __port = None
-    __destination = None
-    __intf = None
-    __jump = None
-    __error: str = None
-    __success: str = None
+    __protocole = ''
+    __port = ''
+    __destination = ''
+    __intf = ''
+    __jump = ''
+    __error: str = ''
+    __success: str = ''
 
     def __init__(self, protocole, port, destination, intf):
         super().__init__()
@@ -25,21 +25,21 @@ class Output:
             "-p": self.__protocole,
             "--sport": self.__port,
             "-s": self.__destination,
-            "-i": self.__intf
+            "-o": self.__intf
         }
         argument = ""
         # louper à travers les attributs
         for key, value in attr.items():
-            if value is not None:
+            if value != '':
                 argument += f"{key} {value} "
 
         # Sauvegarder la commande
-        commande = f"iptables -{place} OUTPUT {argument} -j {jump}"
+        commande = f"sudo iptables -{place} OUTPUT {argument} -j {jump}"
         
         # execution de la commande
         resultat = subprocess.run(commande, capture_output=True, text=True, shell=True)
 
-        if resultat.stdout:
+        if resultat.returncode == 0:
             self.__success = "Operation effectuée avec succès."
             return self.__success
         else:
