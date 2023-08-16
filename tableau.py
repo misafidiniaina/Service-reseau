@@ -29,14 +29,14 @@ class tableau:
             else:
                 self.list_checked.remove(item)
             if len(tableau.list_checked) == 0:
-                self.bouton.configure(state=ctk.DISABLED,cursor="circle")
+                self.bouton.configure(state=ctk.DISABLED,cursor="circle",fg_color="gray")
             else:
-                self.bouton.configure(state=ctk.NORMAL,cursor="hand2")
+                self.bouton.configure(state=ctk.NORMAL,cursor="hand2",fg_color="#e36060",)
 
         Frame_checkBox = ctk.CTkFrame(self.colums[0],corner_radius=0,fg_color="#1a232e")
         state = ctk.StringVar()
         check_value = f"{contents.num}_{contents.chain}"
-        Checkbox = ctk.CTkCheckBox(Frame_checkBox,text='',border_width=3,width=5,height=5,variable=state,command=check_action,onvalue=check_value+"__on",offvalue=check_value+"_off")
+        Checkbox = ctk.CTkCheckBox(Frame_checkBox,text='',border_width=3,width=5,height=5,variable=state,command=check_action,onvalue=check_value+"__on",offvalue=check_value+"_off",fg_color="#48b99d",border_color="#b9bfc9",hover_color="#1a232e",cursor="hand2")
         Checkbox.pack(pady=2)
         Frame_checkBox.pack(fill=ctk.BOTH,expand=True,pady=5,padx=3)
 

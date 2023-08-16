@@ -63,7 +63,7 @@ class ttt:
         if self.octets[0].get() == '' or self.octets[1].get() == '' or self.octets[2].get() == '' or self.octets[3].get()== '' :
             ip = ''
         else:
-            if self.octets[4] == '':
+            if self.octets[4].get() == '':
                 ip = self.octets[0].get()+"."+self.octets[1].get()+"."+self.octets[2].get()+"."+self.octets[3].get()
             else:
                 ip = self.octets[0].get()+"."+self.octets[1].get()+"."+self.octets[2].get()+"."+self.octets[3].get()+"/"+self.octets[4].get()

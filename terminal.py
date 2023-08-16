@@ -148,6 +148,7 @@ def get_link_interface() -> list:
                               shell=True)
     interface = re.sub(r'\s+', ' ', resultat.stdout)
     list_intf = interface.split(" ")
+    list_intf.insert(0, "Toutes")
     return list_intf
 
 def update_file():

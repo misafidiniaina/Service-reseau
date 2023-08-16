@@ -37,7 +37,7 @@ class Forward:
         argument = ""
         # louper à travers les attributs
         for key, value in attr.items():
-            if value != '':
+            if value not in ("", "Toutes"):
                 argument += f"{key} {value} "
 
         # Sauvegarder la commande

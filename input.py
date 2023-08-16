@@ -10,12 +10,13 @@ class Input:
     __error: str = ''
     __success: str = ''
 
-    def __init__(self, protocole, port, source, intf):
+    def __init__(self, protocole, port, source, destination, intf):
         super().__init__()
         self.__protocole = protocole
         self.__port = port
         self.__source = source
         self.__intf = intf
+        self.__destination = destination
 
     def save(self, jump, place='A') -> str:
         #  checker tous les attributs et s'ils ne sont pas "None", on les ajoute dans la commande à executer
@@ -23,12 +24,13 @@ class Input:
             "-p": self.__protocole,
             "--sport": self.__port,
             "-s": self.__source,
-            "-i": self.__intf
+            "-i": self.__intf,
+            "--destination": self.__destination
         }
         argument = ""
         # louper à travers les attributs
         for key, value in attr.items():
-            if value != '':
+            if value not in ("", "Toutes"):
                 argument += f"{key} {value} "
 
         # Sauvegarder la commande

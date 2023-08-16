@@ -8,7 +8,7 @@ from regle import *
 from terminal import *
 from tableau import tableau
 
-
+ctk.set_appearance_mode("dark")
 fenetre = ctk.CTk()
 fenetre.geometry("800x500")
 fenetre.minsize(height=550,width=600)
@@ -97,17 +97,24 @@ Chain_tab.pack(fill=ctk.BOTH,expand=True,side=ctk.BOTTOM)
 Input_chain_composant = ctk.CTkFrame(Input_tab,fg_color="transparent")
 
 champ2=ctk.CTkFrame(Input_chain_composant,fg_color="transparent",)
-label2=ctk.CTkLabel(champ2,text="Adresse IP source:               ")
+label2=ctk.CTkLabel(champ2,text="Adresse IP source:              ")
 label2.pack(side=ctk.LEFT)
 ip_source_input = chmPers.ttt(champ2,fenetre)
 ip_source_input.ip_input()
+champ2.pack(fill=ctk.X,pady=10,padx=30)
+
+champ2=ctk.CTkFrame(Input_chain_composant,fg_color="transparent",)
+label2=ctk.CTkLabel(champ2,text="Adresse IP de déstination: ")
+label2.pack(side=ctk.LEFT)
+ip_destination_input = chmPers.ttt(champ2,fenetre)
+ip_destination_input.ip_input()
 champ2.pack(fill=ctk.X,pady=10,padx=30)
 
 champ4 = ctk.CTkFrame(Input_chain_composant,fg_color='transparent')
 label4=ctk.CTkLabel(champ4,text="Interface :                                   ")
 label4.pack(side=ctk.LEFT)
 liste_interface = get_link_interface()
-interface_Input_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
+interface_Input_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white",cursor="hand2")
 interface_Input_chain.configure(state='readonly')
 interface_Input_chain.pack(side=ctk.LEFT)
 champ4.pack(fill=ctk.BOTH,pady=10,padx=30)
@@ -115,12 +122,12 @@ champ4.pack(fill=ctk.BOTH,pady=10,padx=30)
 champ3 = ctk.CTkFrame(Input_chain_composant,fg_color="transparent")
 label5 = ctk.CTkLabel(champ3,text="Protocole:                                   ")
 label5.pack(side=ctk.LEFT)
-protocole_input_chain=ctk.CTkComboBox(champ3,values=["TCP","UDP","TCP/UDP"],width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
+protocole_input_chain=ctk.CTkComboBox(champ3,values=["Toutes","TCP","UDP","ICMP"],width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white",cursor="hand2")
 protocole_input_chain.configure(state='readonly')
 protocole_input_chain.pack(side=ctk.LEFT)
 label3 = ctk.CTkLabel(champ3,text="       Port:      ")
 label3.pack(side=ctk.LEFT)
-sport = ctk.CTkEntry(champ3,width=50)
+sport = ctk.CTkEntry(champ3,width=50,fg_color="#16181D",border_color="#c3cddb")
 sport.pack(side=ctk.LEFT)
 champ3.pack(fill=ctk.X,pady=10,padx=30)
 
@@ -128,12 +135,13 @@ champ6 = ctk.CTkFrame(Input_chain_composant,fg_color="transparent")
 label6 = ctk.CTkLabel(champ6,text="Action à faire:                            ")
 label6.pack(side=ctk.LEFT)
 action_input_chain= ctk.StringVar()
-action_option_1 = ctk.CTkRadioButton(champ6,text="Accepter" , variable=action_input_chain, value="ACCEPT")
+action_option_1 = ctk.CTkRadioButton(champ6,text="Accepter" , variable=action_input_chain, value="ACCEPT",fg_color="#48b99d",hover_color="#58c9ad",cursor="hand2")
 action_option_1.pack(side=ctk.LEFT)
-action_option_2 = ctk.CTkRadioButton(champ6,text="Réfuser" , variable=action_input_chain, value="DROP")
+action_option_2 = ctk.CTkRadioButton(champ6,text="Réfuser" , variable=action_input_chain, value="DROP",fg_color="#48b99d",hover_color="#58c9ad",cursor="hand2")
 action_option_2.pack(side=ctk.LEFT)
-action_option_3 = ctk.CTkRadioButton(champ6,text="Rejeter", variable=action_input_chain, value="REJECT")
+action_option_3 = ctk.CTkRadioButton(champ6,text="Rejeter", variable=action_input_chain, value="REJECT",fg_color="#48b99d",hover_color="#58c9ad",cursor="hand2")
 action_option_3.pack(side=ctk.LEFT)
+action_input_chain.set("REJECT")
 champ6.pack(fill=ctk.X,pady=10,padx=30)
 
 Input_chain_composant.pack(pady=10) 
@@ -146,7 +154,8 @@ def get_data_input():
     action_ = action_input_chain.get()                                             
     ip_source_ = ip_source_input._get_ip()                                          
     interface = interface_Input_chain.get()
-    input = Input(protocol,port,ip_source_,interface)
+    dest_ip = ip_destination_input._get_ip()
+    input = Input(protocol,port,ip_source_,dest_ip,interface)
     return_message = input.save(action_)
     Mbox = chmPers.Messagebox(return_message)
     Mbox.affiche_mbox()
@@ -157,13 +166,18 @@ bouton_ok_INPUT = ctk.CTkButton(bouton,cursor="hand2",
     width=50,
     height=35,
     fg_color="#2ca089",
-    command=get_data_input
+    command=get_data_input,
+    hover_color="#3cb098"
 )
 bouton_ok_INPUT.pack(side=ctk.RIGHT,padx=5)
 def annuler_input():
     sport.delete(0,"end")
     ip_source_input._set_empty()
+    ip_destination_input._set_empty()
     ip_source_input._set_focus()
+    action_input_chain.set("REJECT")
+    protocole_input_chain.set("Toutes")
+    interface_Input_chain.set(liste_interface[0])
 
 bouton_annuler_INPUT = ctk.CTkButton(bouton,cursor="hand2",
     text="Annuler",
@@ -172,9 +186,9 @@ bouton_annuler_INPUT = ctk.CTkButton(bouton,cursor="hand2",
     text_color="#2ca089",
     border_width=2,
     border_color="#2ca089",
-    hover_color="#16202c",
+    hover_color="#14161b",
     height=35,
-    command=annuler_input
+    command=annuler_input,
 )
 bouton_annuler_INPUT.pack(side=ctk.RIGHT,padx=5)
 
@@ -185,7 +199,14 @@ bouton_Input_chain_frame.pack(side=ctk.BOTTOM,fill=ctk.X,pady=5,padx=5,ipady=10,
 Output_chain_composant = ctk.CTkFrame(Output_tab,fg_color="transparent")
 
 champ2=ctk.CTkFrame(Output_chain_composant,fg_color="transparent",)
-label2=ctk.CTkLabel(champ2,text="Adresse IP de déstination: ")
+label2=ctk.CTkLabel(champ2,text="Adresse IP source:               ")
+label2.pack(side=ctk.LEFT)
+ip_source_output = chmPers.ttt(champ2,fenetre)
+ip_source_output.ip_input()
+champ2.pack(fill=ctk.X,pady=10,padx=30)
+
+champ2=ctk.CTkFrame(Output_chain_composant,fg_color="transparent",)
+label2=ctk.CTkLabel(champ2,text="Adresse IP de déstination:  ")
 label2.pack(side=ctk.LEFT)
 ip_destination_output = chmPers.ttt(champ2,fenetre)
 ip_destination_output.ip_input()
@@ -194,7 +215,7 @@ champ2.pack(fill=ctk.X,pady=10,padx=30)
 champ4 = ctk.CTkFrame(Output_chain_composant,fg_color='transparent')
 label4=ctk.CTkLabel(champ4,text="Interface :                                   ")
 label4.pack(side=ctk.LEFT)
-interface_Output_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
+interface_Output_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white",cursor="hand2")
 interface_Output_chain.configure(state='readonly')
 interface_Output_chain.pack(side=ctk.LEFT)
 champ4.pack(fill=ctk.BOTH,pady=10,padx=30)
@@ -202,12 +223,12 @@ champ4.pack(fill=ctk.BOTH,pady=10,padx=30)
 champ3 = ctk.CTkFrame(Output_chain_composant,fg_color="transparent")
 label5 = ctk.CTkLabel(champ3,text="Protocole:                                   ")
 label5.pack(side=ctk.LEFT)
-protocole=ctk.CTkComboBox(champ3,values=["TCP","UDP","TCP/UDP"],width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
-protocole.configure(state='readonly')
-protocole.pack(side=ctk.LEFT)
+protocole_output_chain=ctk.CTkComboBox(champ3,values=["Toutes","TCP","UDP","ICMP"],width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white",cursor="hand2")
+protocole_output_chain.configure(state='readonly')
+protocole_output_chain.pack(side=ctk.LEFT)
 label3 = ctk.CTkLabel(champ3,text="       Port:      ")
 label3.pack(side=ctk.LEFT)
-dport = ctk.CTkEntry(champ3,width=50)
+dport = ctk.CTkEntry(champ3,width=50,fg_color="#16181D",border_color="#c3cddb")
 dport.pack(side=ctk.LEFT)
 champ3.pack(fill=ctk.X,pady=10,padx=30)
 
@@ -215,12 +236,13 @@ champ6 = ctk.CTkFrame(Output_chain_composant,fg_color="transparent")
 label6 = ctk.CTkLabel(champ6,text="Action à faire:                            ")
 label6.pack(side=ctk.LEFT)
 action_output_chain= ctk.StringVar()
-action_option_1 = ctk.CTkRadioButton(champ6,text="Accepter" , variable=action_output_chain, value="ACCEPT")
+action_option_1 = ctk.CTkRadioButton(champ6,text="Accepter" , variable=action_output_chain, value="ACCEPT",fg_color="#48b99d",hover_color="#58c9ad",cursor="hand2")
 action_option_1.pack(side=ctk.LEFT)
-action_option_2 = ctk.CTkRadioButton(champ6,text="Réfuser" , variable=action_output_chain, value="DROP")
+action_option_2 = ctk.CTkRadioButton(champ6,text="Réfuser" , variable=action_output_chain, value="DROP",fg_color="#48b99d",hover_color="#58c9ad",cursor="hand2")
 action_option_2.pack(side=ctk.LEFT)
-action_option_3 = ctk.CTkRadioButton(champ6,text="Rejeter", variable=action_output_chain, value="REJECT")
+action_option_3 = ctk.CTkRadioButton(champ6,text="Rejeter", variable=action_output_chain, value="REJECT",fg_color="#48b99d",hover_color="#58c9ad",cursor="hand2")
 action_option_3.pack(side=ctk.LEFT)
+action_output_chain.set("REJECT")
 champ6.pack(fill=ctk.X,pady=10,padx=30)
 
 Output_chain_composant.pack(pady=10) 
@@ -229,11 +251,12 @@ bouton_Output_chain_frame = ctk.CTkFrame(Output_tab,fg_color="transparent")
 bouton = ctk.CTkFrame(bouton_Output_chain_frame,fg_color="transparent")
 def yes():
     port_s = dport.get()
-    protocol = protocole.get()
+    protocol = protocole_output_chain.get()
     action_ = action_output_chain.get()
     ip_dest = ip_destination_output._get_ip()
+    source_ip = ip_source_output._get_ip()
     interface = interface_Output_chain.get()
-    output = Output(protocol,port_s,ip_dest,interface)
+    output = Output(protocol,port_s,source_ip,ip_dest,interface)
     return_message = output.save(action_)
     Mbox = chmPers.Messagebox(return_message)
     Mbox.affiche_mbox()
@@ -245,13 +268,18 @@ bouton_ok_OUTPUT = ctk.CTkButton(bouton,cursor="hand2",
     width=50,
     height=35,
     fg_color="#2ca089",
-    command=yes
+    command=yes,
+    hover_color="#3cb098"
 )
 bouton_ok_OUTPUT.pack(side=ctk.RIGHT,padx=5)
 def annuler_output():
     dport.delete(0,"end")
     ip_destination_output._set_empty()
+    ip_source_output._set_empty()
     ip_destination_output._set_focus()
+    action_output_chain.set("REJECT")
+    protocole_output_chain.set("Toutes")
+    interface_Output_chain.set(liste_interface[0])
 
 bouton_annuler_OUTPUT = ctk.CTkButton(bouton,cursor="hand2",
     text="Annuler",
@@ -260,7 +288,7 @@ bouton_annuler_OUTPUT = ctk.CTkButton(bouton,cursor="hand2",
     text_color="#2ca089",
     border_width=2,
     border_color="#2ca089",
-    hover_color="#16202c",
+    hover_color="#14161b",
     height=35,
     command=annuler_output
 )
@@ -289,12 +317,12 @@ champ1.pack(fill=ctk.X,pady=10,padx=30)
 champ4 = ctk.CTkFrame(Forward_chain_composant,fg_color='transparent')
 label4=ctk.CTkLabel(champ4,text="Interface d'entrée                    ")
 label4.pack(side=ctk.LEFT)
-interface_entrer_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
+interface_entrer_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white",cursor="hand2")
 interface_entrer_chain.configure(state='readonly')
 interface_entrer_chain.pack(side=ctk.LEFT)
 label4=ctk.CTkLabel(champ4,text="      Interface de sortie:      ")
 label4.pack(side=ctk.LEFT)
-interface_sortie_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
+interface_sortie_chain = ctk.CTkComboBox(champ4,values=liste_interface,width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white",cursor="hand2")
 interface_sortie_chain.configure(state='readonly')
 interface_sortie_chain.pack(side=ctk.LEFT)
 champ4.pack(fill=ctk.BOTH,pady=10,padx=30)
@@ -302,7 +330,7 @@ champ4.pack(fill=ctk.BOTH,pady=10,padx=30)
 champ3 = ctk.CTkFrame(Forward_chain_composant,fg_color="transparent")
 label5 = ctk.CTkLabel(champ3,text="Protocole:                                   ")
 label5.pack(side=ctk.LEFT)
-protocole=ctk.CTkComboBox(champ3,values=["TCP","UDP","TCP/UDP"],width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white")
+protocole=ctk.CTkComboBox(champ3,values=["Toutes","TCP","UDP","ICMP"],width=100,fg_color="#16181D",border_color="#b9bfc9",button_color="#c3cddb",text_color="white",cursor="hand2")
 protocole.configure(state='readonly')
 protocole.pack(side=ctk.LEFT)
 
@@ -311,11 +339,11 @@ champ3.pack(fill=ctk.X,pady=10,padx=30)
 champ7 = ctk.CTkFrame(Forward_chain_composant,fg_color="transparent")
 label3 = ctk.CTkLabel(champ7,text="Port d'entréé:                             ")
 label3.pack(side=ctk.LEFT)
-inport = ctk.CTkEntry(champ7,width=50)
+inport = ctk.CTkEntry(champ7,width=50,fg_color="#16181D",border_color="#c3cddb")
 inport.pack(side=ctk.LEFT)
 label3 = ctk.CTkLabel(champ7,text="       Port de sortie:   ")
 label3.pack(side=ctk.LEFT)
-outport = ctk.CTkEntry(champ7,width=50)
+outport = ctk.CTkEntry(champ7,width=50,fg_color="#16181D",border_color="#c3cddb")
 outport.pack(side=ctk.LEFT)
 champ7.pack(fill=ctk.X,pady=10,padx=30)
 
@@ -323,26 +351,26 @@ champ6 = ctk.CTkFrame(Forward_chain_composant,fg_color="transparent")
 label6 = ctk.CTkLabel(champ6,text="Action à faire:                            ")
 label6.pack(side=ctk.LEFT)
 action= ctk.StringVar()
-action_option_1 = ctk.CTkRadioButton(champ6,text="Accepter" , variable=action, value="ACCEPT")
+action_option_1 = ctk.CTkRadioButton(champ6,text="Accepter" , variable=action, value="ACCEPT",fg_color="#48b99d",hover_color="#58c9ad",cursor="hand2")
 action_option_1.pack(side=ctk.LEFT)
-action_option_2 = ctk.CTkRadioButton(champ6,text="Réfuser" , variable=action, value="DROP")
+action_option_2 = ctk.CTkRadioButton(champ6,text="Réfuser" , variable=action, value="DROP",fg_color="#48b99d",hover_color="#58c9ad",cursor="hand2")
 action_option_2.pack(side=ctk.LEFT)
-action_option_3 = ctk.CTkRadioButton(champ6,text="Rejeter", variable=action, value="REJECT")
+action_option_3 = ctk.CTkRadioButton(champ6,text="Rejeter", variable=action, value="REJECT",fg_color="#48b99d",hover_color="#58c9ad",cursor="hand2")
 action_option_3.pack(side=ctk.LEFT)
+action.set("REJECT")
 champ6.pack(fill=ctk.X,pady=10,padx=30)
 
 bouton_Input_chain_frame = ctk.CTkFrame(Forward_tab,fg_color="transparent")
 bouton = ctk.CTkFrame(bouton_Input_chain_frame,fg_color="transparent")
 def yes():
-    port_s = sport.get()
-    port_d = dport.get()
+    port_s = inport.get()
+    port_d = outport.get()
     INint = interface_entrer_chain.get()
     Outint = interface_sortie_chain.get()
     protocol = protocole.get()
     action_ = action.get()
     ip_d = ip_destination._get_ip()
     ip_s = ip_source._get_ip()
-    print(ip_d)
     forward = Forward(protocol,port_s,port_d,INint,Outint,ip_s,ip_d)
     return_message = forward.save(action_)
     Mbox = chmPers.Messagebox(return_message)
@@ -354,17 +382,22 @@ bouton_ok_FORWARD = ctk.CTkButton(bouton,cursor="hand2",
     width=50,
     height=35,
     fg_color="#2ca089",
-    command=yes
+    command=yes,
+    hover_color="#3cb098"
 )
 
 bouton_ok_FORWARD.pack(side=ctk.RIGHT,padx=5)
 
 def annuler_forward():
-    sport.delete(0,"end")
-    dport.delete(0,"end")
+    inport.delete(0,"end")
+    outport.delete(0,"end")
     ip_destination._set_empty()
     ip_source._set_empty()
     ip_source._set_focus()
+    action.set("REJECT")
+    protocole.set("Toutes")
+    interface_entrer_chain.set(liste_interface[0])
+    interface_sortie_chain.set(liste_interface[0])
 
 bouton_annuler_FORWARD = ctk.CTkButton(bouton,cursor="hand2",
     text="Annuler",
@@ -373,7 +406,7 @@ bouton_annuler_FORWARD = ctk.CTkButton(bouton,cursor="hand2",
     text_color="#2ca089",
     border_width=2,
     border_color="#2ca089",
-    hover_color="#16202c",
+    hover_color="#14161b",
     height=35,
     command=annuler_forward
 )
@@ -412,7 +445,7 @@ def delete_checked():
         message = "Etes-vous sûre de supprimer cette règle ?"
     else:
         message = "Etes-vous sûre de supprimer ces "+str(len(tableau.list_checked))+" règles ?"
-    msg = CTkMessagebox(title="Supprimer ?", message=message,icon="question", option_1="Annuler", option_2="Oui")
+    msg = CTkMessagebox(title="Supprimer ?", message=message,icon="question", option_1="Annuler", option_2="Oui",option_focus="Annuler",bg_color="#26282D",fg_color="#2a333f",border_width=30, border_color="#26282D",width=360,cancel_button="circle",button_color="#0c8069",button_hover_color="#2ca089",justify="center")
     
     response = msg.get()
     if response == "Oui":
@@ -426,7 +459,7 @@ def delete_checked():
         pass
 
 bouton_liste_frame = ctk.CTkFrame(page2,fg_color="transparent")
-delete_btn = ctk.CTkButton(bouton_liste_frame,text="Supprimer",fg_color="#e36060",hover_color="#f47171",state=ctk.DISABLED,text_color_disabled="#fC8282",command=delete_checked,cursor="circle")
+delete_btn = ctk.CTkButton(bouton_liste_frame,text="Supprimer",fg_color="gray",hover_color="#f47171",state=ctk.DISABLED,command=delete_checked,cursor="circle")
 Liste_regle_frame = ctk.CTkScrollableFrame(page2,fg_color="transparent") #frame principale pour les liste accordion
 input_LFrame = ctk.CTkFrame(Liste_regle_frame,fg_color="transparent")#frame pour la liste des input
 I_title_frame = ctk.CTkFrame(input_LFrame,fg_color="transparent")#frame contenant le titre INPUT
