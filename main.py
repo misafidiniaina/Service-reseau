@@ -12,6 +12,7 @@ ctk.set_appearance_mode("dark")
 fenetre = ctk.CTk()
 fenetre.geometry("800x500")
 fenetre.minsize(height=550,width=600)
+fenetre.title("Pare-feu")
 global Rule_list
 def move_next_page():
     global cont
@@ -28,6 +29,7 @@ def move_next_page():
     tableau_forward.clean()
     rule_list = update_file()
     #remplie_tab(rule_list
+    delete_btn.configure(state=ctk.DISABLED,cursor="circle",fg_color="gray")
     tableau_Input.buildTabHeader()
     tableau_Output.buildTabHeader()
     tableau_forward.buildTabHeader()
@@ -141,7 +143,7 @@ action_option_2 = ctk.CTkRadioButton(champ6,text="Réfuser" , variable=action_in
 action_option_2.pack(side=ctk.LEFT)
 action_option_3 = ctk.CTkRadioButton(champ6,text="Rejeter", variable=action_input_chain, value="REJECT",fg_color="#48b99d",hover_color="#58c9ad",cursor="hand2")
 action_option_3.pack(side=ctk.LEFT)
-action_input_chain.set("REJECT")
+action_input_chain.set("DROP")
 champ6.pack(fill=ctk.X,pady=10,padx=30)
 
 Input_chain_composant.pack(pady=10) 
@@ -175,7 +177,7 @@ def annuler_input():
     ip_source_input._set_empty()
     ip_destination_input._set_empty()
     ip_source_input._set_focus()
-    action_input_chain.set("REJECT")
+    action_input_chain.set("DROP")
     protocole_input_chain.set("Toutes")
     interface_Input_chain.set(liste_interface[0])
 
@@ -242,7 +244,7 @@ action_option_2 = ctk.CTkRadioButton(champ6,text="Réfuser" , variable=action_ou
 action_option_2.pack(side=ctk.LEFT)
 action_option_3 = ctk.CTkRadioButton(champ6,text="Rejeter", variable=action_output_chain, value="REJECT",fg_color="#48b99d",hover_color="#58c9ad",cursor="hand2")
 action_option_3.pack(side=ctk.LEFT)
-action_output_chain.set("REJECT")
+action_output_chain.set("DROP")
 champ6.pack(fill=ctk.X,pady=10,padx=30)
 
 Output_chain_composant.pack(pady=10) 
@@ -276,8 +278,8 @@ def annuler_output():
     dport.delete(0,"end")
     ip_destination_output._set_empty()
     ip_source_output._set_empty()
-    ip_destination_output._set_focus()
-    action_output_chain.set("REJECT")
+    ip_source_output._set_focus()
+    action_output_chain.set("DROP")
     protocole_output_chain.set("Toutes")
     interface_Output_chain.set(liste_interface[0])
 
@@ -357,7 +359,7 @@ action_option_2 = ctk.CTkRadioButton(champ6,text="Réfuser" , variable=action, v
 action_option_2.pack(side=ctk.LEFT)
 action_option_3 = ctk.CTkRadioButton(champ6,text="Rejeter", variable=action, value="REJECT",fg_color="#48b99d",hover_color="#58c9ad",cursor="hand2")
 action_option_3.pack(side=ctk.LEFT)
-action.set("REJECT")
+action.set("DROP")
 champ6.pack(fill=ctk.X,pady=10,padx=30)
 
 bouton_Input_chain_frame = ctk.CTkFrame(Forward_tab,fg_color="transparent")
@@ -394,7 +396,7 @@ def annuler_forward():
     ip_destination._set_empty()
     ip_source._set_empty()
     ip_source._set_focus()
-    action.set("REJECT")
+    action.set("DROP")
     protocole.set("Toutes")
     interface_entrer_chain.set(liste_interface[0])
     interface_sortie_chain.set(liste_interface[0])
@@ -429,6 +431,7 @@ def toggle_widget(widget):
         widget.pack(fill=ctk.BOTH)  # Pour afficher le widget
  
 def input_clicked(): #fonction qui agit si on veut voir la liste de INPUT
+    title_input.pack_configure(fill=ctk.X)
     toggle_widget(I_list)
 
 def output_clicked(): #fonction qui agit sin on veut voir la liste de OUTPUT
@@ -445,14 +448,14 @@ def delete_checked():
         message = "Etes-vous sûre de supprimer cette règle ?"
     else:
         message = "Etes-vous sûre de supprimer ces "+str(len(tableau.list_checked))+" règles ?"
-    msg = CTkMessagebox(title="Supprimer ?", message=message,icon="question", option_1="Annuler", option_2="Oui",option_focus="Annuler",bg_color="#26282D",fg_color="#2a333f",border_width=30, border_color="#26282D",width=360,cancel_button="circle",button_color="#0c8069",button_hover_color="#2ca089",justify="center")
+    msg = CTkMessagebox(fenetre,title="Supprimer ?", message=message,icon="question", option_1="Oui", option_2="Annuler",option_focus="Annuler",bg_color="#26282D",fg_color="#2a333f",border_width=30, border_color="#26282D",width=360,cancel_button="circle",button_color="#0c8069",button_hover_color="#2ca089",justify="center")
     
     response = msg.get()
     if response == "Oui":
         I_list.pack_forget()
         O_list.pack_forget()
         F_list.pack_forget()
-        delete_btn.configure(state=ctk.DISABLED)
+        delete_btn.configure(state=ctk.DISABLED,cursor="circle",fg_color="gray")
         effacer_regle(tableau.list_checked)
         move_next_page()
     else:
